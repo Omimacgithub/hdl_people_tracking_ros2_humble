@@ -1,15 +1,31 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(hdl_people_tracking)
+cmake_minimum_required(VERSION 3.5)
+project(hdl_people_tracking_ros2_humble)
 
 # -mavx causes a lot of errors!!
-add_definitions(-std=c++11 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2)
-set(CMAKE_CXX_FLAGS "-std=c++11 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
+#add_definitions(-std=c++11 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2)
+#set(CMAKE_CXX_FLAGS "-std=c++11 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # pcl 1.7 causes a segfault when it is built with debug mode
 set(CMAKE_BUILD_TYPE "RELEASE")
 
 find_package(OpenCV REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(pcl_ros REQUIRED)
+find_package(pcl_ros REQUIRED)
+find_package(pcl_ros REQUIRED)
+find_package(pcl_ros REQUIRED)
+find_package(pcl_ros REQUIRED)
 
 find_package(Qt5Gui)
 find_package(Qt5Core)
@@ -18,45 +34,58 @@ find_package(Qt5Test)
 find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
 
-find_package(catkin REQUIRED COMPONENTS
-  nodelet
-  pcl_ros
-  roscpp
-  sensor_msgs
-  message_generation
-)
+#find_package(catkin REQUIRED COMPONENTS
+#  nodelet
+#  pcl_ros
+#  roscpp
+#  sensor_msgs
+#  message_generation
+#)
 
 ########################
 ## message generation ##
 ########################
-add_message_files(FILES
-  Cluster.msg
-  ClusterArray.msg
-  Track.msg
-  TrackArray.msg
+#add_message_files(FILES
+#  Cluster.msg
+#  ClusterArray.msg
+#  Track.msg
+#  TrackArray.msg
+#)
+
+#generate_messages(DEPENDENCIES std_msgs geometry_msgs)
+rosidl_generate_interfaces(
+    ${PROJECT_NAME}
+        "msg/Cluster.msg"
+	"msg/ClusterArray.msg"
+        "msg/Track.msg"
+	"msg/TrackArray.msg"
+    DEPENDENCIES
+        geometry_msgs
+        std_msgs
 )
-
-generate_messages(DEPENDENCIES std_msgs geometry_msgs)
-
 
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package(
-   INCLUDE_DIRS include
-   LIBRARIES hdl_people_tracking
-   CATKIN_DEPENDS nodelet pcl_ros roscpp sensor_msgs message_runtime
+#catkin_package(
+#   INCLUDE_DIRS include
+#   LIBRARIES hdl_people_tracking
+#   CATKIN_DEPENDS nodelet pcl_ros roscpp sensor_msgs message_runtime
 #   DEPENDS system_lib
-)
+#)
+
 
 ###########
 ## Build ##
 ###########
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
+#include_directories(
+    #include
+    #${catkin_INCLUDE_DIRS}
+#)
 
+include_directories(include)
+
+set(catkin_LIBRARIES "hdl_people_tracking")
 
 add_library(hdl_people_detection_nodelet
   apps/hdl_people_detection_nodelet.cpp
@@ -77,3 +106,36 @@ target_link_libraries(hdl_people_tracking_nodelet
   ${PCL_LIBRARIES}
 )
 add_dependencies(hdl_people_tracking_nodelet hdl_people_tracking_gencpp)
+
+ament_target_dependencies(align
+  rclcpp
+  std_msgs
+)
+
+############
+## INSTAL ##
+############
+
+install(TARGETS 
+  align
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  TARGETS
+    align
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+# install headers
+install(
+  DIRECTORY "include/"
+  DESTINATION include
+)
+
+ament_export_dependencies(rclcpp)
+ament_export_include_directories(include)
+
+ament_package()
