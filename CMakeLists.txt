@@ -15,17 +15,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(CMAKE_BUILD_TYPE "RELEASE")
 
 find_package(OpenCV REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-find_package(ament_cmake REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(pcl_ros REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(pcl_ros REQUIRED)
-find_package(pcl_ros REQUIRED)
-find_package(pcl_ros REQUIRED)
-find_package(pcl_ros REQUIRED)
-find_package(pcl_ros REQUIRED)
 
 find_package(Qt5Gui)
 find_package(Qt5Core)
@@ -70,7 +68,7 @@ rosidl_generate_interfaces(
 #catkin_package(
 #   INCLUDE_DIRS include
 #   LIBRARIES hdl_people_tracking
-#   CATKIN_DEPENDS nodelet pcl_ros roscpp sensor_msgs message_runtime
+#   CATKIN_DEPENDS nodelet pcl_ros rclcpp sensor_msgs message_runtime
 #   DEPENDS system_lib
 #)
 
@@ -85,7 +83,7 @@ rosidl_generate_interfaces(
 
 include_directories(include)
 
-set(catkin_LIBRARIES "hdl_people_tracking")
+#set(catkin_LIBRARIES "hdl_people_tracking")
 
 add_library(hdl_people_detection_nodelet
   apps/hdl_people_detection_nodelet.cpp
@@ -97,7 +95,7 @@ target_link_libraries(hdl_people_detection_nodelet
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-add_dependencies(hdl_people_detection_nodelet hdl_people_tracking_gencpp)
+#add_dependencies(hdl_people_detection_nodelet hdl_people_tracking_gencpp)
 
 add_library(hdl_people_tracking_nodelet apps/hdl_people_tracking_nodelet.cpp)
 target_link_libraries(hdl_people_tracking_nodelet
@@ -105,25 +103,26 @@ target_link_libraries(hdl_people_tracking_nodelet
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-add_dependencies(hdl_people_tracking_nodelet hdl_people_tracking_gencpp)
 
-ament_target_dependencies(align
-  rclcpp
-  std_msgs
-)
+#add_dependencies(hdl_people_tracking_nodelet hdl_people_tracking_gencpp)
+
+#ament_target_dependencies(hdl_people_tracking_nodelet
+#  rclcpp
+#  std_msgs
+#)
 
 ############
 ## INSTAL ##
 ############
 
 install(TARGETS 
-  align
+  hdl_people_tracking_nodelet
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
   TARGETS
-    align
+    hdl_people_tracking_nodelet
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
